@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DELTARUNE — Темная Колода</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0c14; --bg2:#17131f; --bg3:#221e30; --card:#1f1b2e;
+  --purple:#7c5cff; --purple2:#a48bff; --green:#3dd68c; --green2:#a1ffce;
+  --blue:#6aa6ff; --text:#e9e6f0; --muted:#9a95aa; --border:#2e2942; --danger:#ff5c7a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Manrope',system-ui,sans-serif;min-height:100vh}
+h1,h2,h3{font-family:'VT323',monospace;letter-spacing:1px;font-weight:400}
+a{color:var(--purple2)}
+.app{max-width:1280px;margin:0 auto;padding:24px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--border);background:linear-gradient(180deg,var(--bg2),var(--bg));border-radius:20px;padding:16px 20px;position:sticky;top:12px;z-index:10;backdrop-filter:blur(12px)}
+.logo{display:flex;align-items:center;gap:14px}
+.logo-icon{width:52px;height:72px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#fff;display:grid;place-items:center;font-family:'VT323';font-size:32px;color:#000}
+.logo-icon img{width:100%;height:100%;object-fit:cover}
+.logo-text h1{margin:0;font-size:32px;line-height:1;color:var(--text)}
+.logo-text p{margin:2px 0 0 0;color:var(--muted);font-size:13px}
+.nav{display:flex;gap:8px;background:var(--bg3);padding:6px;border-radius:999px;border:1px solid var(--border)}
+.nav button{border:none;background:transparent;color:var(--muted);padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;transition:.2s}
+.nav button.active{background:var(--text);color:var(--bg);box-shadow:0 4px 16px rgba(255,255,255,.15)}
+.tab{display:none;margin-top:28px;animation:fade .3s ease}
+.tab.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.suit-section{margin-bottom:36px}
+.suit-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.suit-badge{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:18px;border:1px solid var(--border)}
+.suit-badge.spades,.suit-badge.clubs{background:#1a233a;color:var(--blue)}
+.suit-badge.hearts,.suit-badge.diamonds{background:#14281f;color:var(--green)}
+.suit-badge.joker{background:#2a2440;color:var(--purple2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.card-tile{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:10px;transition:.2s;cursor:pointer;position:relative;overflow:hidden}
+.card-tile:hover{transform:translateY(-4px);border-color:var(--purple2);box-shadow:0 12px 30px rgba(124,92,255,.2)}
+.card-tile img{width:100%;aspect-ratio:2.5/3.5;object-fit:contain;background:#0f0e16;border-radius:10px;display:block}
+.card-tile .meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--muted)}
+.card-tile .meta b{color:var(--text);font-size:13px}
+.rules-layout{display:grid;grid-template-columns:320px 1fr;gap:24px}
+@media(max-width:900px){.rules-layout{grid-template-columns:1fr}}
+.rules-card-img{position:sticky;top:100px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:14px}
+.rules-card-img img{width:100%;border-radius:12px;display:block;background:#fff}
+.rules-card-img p{font-size:13px;color:var(--muted);margin:10px 0 0 0;line-height:1.5}
+.rule-block{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px}
+.rule-block h3{margin:0 0 8px 0;font-size:26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rule-block .tag{display:inline-block;font-size:11px;padding:4px 10px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);color:var(--muted)}
+.rule-block p,.rule-block li{color:#c8c4d6;font-size:14px;line-height:1.6}
+.rule-block ul{padding-left:18px}
+.games-nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.games-nav button{border:1px solid var(--border);background:var(--bg2);color:var(--text);padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:8px;transition:.2s}
+.games-nav button.active{background:var(--purple);border-color:var(--purple);color:white;box-shadow:0 8px 24px rgba(124,92,255,.35)}
+.game-area{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:20px;min-height:520px;position:relative;overflow:hidden}
+.game-area::before{content:"";position:absolute;inset:0;background:radial-gradient(800px 400px at 20% -10%, rgba(124,92,255,.15), transparent), radial-gradient(600px 300px at 90% 0%, rgba(61,214,140,.12), transparent);pointer-events:none}
+.btn{border:none;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;font-size:14px}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-purple{background:var(--purple);color:white}
+.btn:disabled{opacity:.5;pointer-events:none}
+.scoreboard{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.score-pill{background:var(--bg3);border:1px solid var(--border);padding:8px 14px;border-radius:999px;font-size:13px;display:flex;gap:8px;align-items:center}
+.score-pill b{color:var(--text)}
+.hand{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;min-height:120px}
+.hand .playing-card{width:110px;transition:.2s;filter:drop-shadow(0 8px 16px rgba(0,0,0,.4))}
+.hand .playing-card:hover{transform:translateY(-8px)}
+.playing-card{width:110px;aspect-ratio:2.5/3.5;border-radius:12px;overflow:hidden;background:#0f0e16;border:1px solid var(--border);position:relative;display:flex;align-items:center;justify-content:center}
+.playing-card img{width:100%;height:100%;object-fit:contain;display:block}
+.playing-card.back{background:repeating-linear-gradient(45deg,#1a1628,#1a1628 10px,#221d35 10px,#221d35 20px);display:grid;place-items:center;border:1px solid #3a3458}
+.playing-card.back::after{content:"?";font-family:'VT323';font-size:42px;color:var(--purple2);opacity:.6}
+.playing-card.fallback{flex-direction:column;background:linear-gradient(180deg,#1f1b2e,#15121f);padding:8px;text-align:center}
+.playing-card.fallback .big{font-family:'VT323';font-size:36px;line-height:1}
+.playing-card.fallback .small{font-size:11px;color:var(--muted);margin-top:4px}
+.table-area{background:rgba(0,0,0,.25);border:1px dashed var(--border);border-radius:16px;padding:16px;min-height:160px;margin:16px 0;position:relative}
+.status{font-family:'VT323';font-size:22px;letter-spacing:.5px;margin:8px 0;position:relative}
+.status.win{color:var(--green)} .status.lose{color:var(--danger)} .status.draw{color:var(--blue)}
+.bj-layout{display:grid;grid-template-columns:1fr 280px;gap:20px}
+@media(max-width:900px){.bj-layout{grid-template-columns:1fr}}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.memory-grid{display:grid;gap:10px;justify-content:center;margin-top:16px}
+.memory-grid.cols4{grid-template-columns:repeat(4, minmax(80px,110px))}
+.memory-grid.cols6{grid-template-columns:repeat(6, minmax(70px,110px))}
+.mem-card{aspect-ratio:2.5/3.5;border-radius:12px;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .5s}
+.mem-card.flipped{transform:rotateY(180deg)}
+.mem-card.matched{opacity:.45;pointer-events:none}
+.mem-card .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.mem-card .front{transform:rotateY(180deg);background:#0f0e16;display:flex;align-items:center;justify-content:center}
+.mem-card .front img{width:100%;height:100%;object-fit:contain}
+.mem-card .back{background:radial-gradient(200px 200px at 50% 0%, #2a2450, #15121f);display:grid;place-items:center}
+.mem-card .back::after{content:"";width:40px;height:40px;background:var(--purple);mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8 2 4 4.5 4 8c0 2.5 1.5 4 3 5l-1 5 4-2 4 2-1-5c1.5-1 3-2.5 3-5 0-3.5-4-6-8-6z" fill="black"/></svg>') center/contain no-repeat; opacity:.7}
+.durak-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.trump-badge{background:var(--bg3);border:1px solid var(--border);padding:8px 12px;border-radius:999px;display:flex;align-items:center;gap:8px}
+.trump-badge img{width:28px;height:40px;object-fit:contain;border-radius:6px;background:#fff}
+.opponent-hand{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.opponent-hand .playing-card{width:52px;filter:brightness(.8)}
+.your-hand .playing-card{cursor:pointer}
+.your-hand .playing-card.selected{outline:2px solid var(--purple);transform:translateY(-12px);box-shadow:0 12px 24px rgba(124,92,255,.4)}
+.table-cards{display:flex;gap:20px;flex-wrap:wrap}
+.attack-defense{display:flex;flex-direction:column;gap:6px;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:8px;min-width:120px}
+.attack-defense .vs{font-size:11px;color:var(--muted);font-weight:800}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;place-items:center;z-index:100;padding:20px}
+.modal.open{display:grid}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:16px;max-width:420px;width:100%}
+.modal-box img{width:100%;border-radius:12px;background:#fff}
+.modal-box .close{margin-top:12px;width:100%}
+.footer{margin-top:40px;padding:20px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+.alert{border:1px solid #5a3; background:#14281f; color:#a1ffce; padding:12px 14px; border-radius:12px; margin-bottom:16px; font-size:13px; line-height:1.5}
+.alert.error{border-color:#a33; background:#2a1515; color:#ffb3b3}
+.kbd{font-family:'VT323';background:var(--bg3);border:1px solid var(--border);border-bottom-width:2px;padding:2px 6px;border-radius:6px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon"><img src="assets/cards/joker.jpg" alt="J" onerror="this.style.display='none'; this.parentElement.textContent='J'"></div>
+      <div class="logo-text">
+        <h1>DELTARUNE — ТЕМНАЯ КОЛОДА</h1>
+        <p>Оффлайн коллекция • 52 карты + Джокер • 3 игры против Тьмы</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <button data-tab="deck" class="active">🃏 Колода</button>
+      <button data-tab="rules">📜 Правила</button>
+      <button data-tab="games">🎮 Играть</button>
+    </nav>
+  </header>
+
+  <div id="file-warning" style="display:none" class="alert error" style="margin-top:16px">
+    <b>⚠️ Открыто как один файл без папки assets</b><br>
+    Картинки не найдутся. Пожалуйста, скачай полный архив <b>deltarune-cards.zip</b> и распакуй папку целиком, потом открывай index.html внутри папки. Или используй версию <b>deltarune-single.html</b> где все картинки встроены.
+  </div>
+
+  <section id="tab-deck" class="tab active">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+      <div>
+        <h2 style="margin:0;font-size:38px">Полная колода Тьмы</h2>
+        <p style="margin:6px 0 0 0;color:var(--muted)">Нажми на карту чтобы рассмотреть. Каждая масть — свой кошмар.</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="score-pill"><b>♠</b> Пики — рты</span>
+        <span class="score-pill"><b>♣</b> Крести — коты</span>
+        <span class="score-pill"><b style="color:var(--green)">♥</b> Черви — зубы</span>
+        <span class="score-pill"><b style="color:var(--green)">♦</b> Бубны — глаза</span>
+      </div>
+    </div>
+    <div id="deck-container"></div>
+  </section>
+
+  <section id="tab-rules" class="tab">
+    <div class="rules-layout">
+      <div class="rules-card-img">
+        <img src="assets/rules.jpg" alt="Rules card" onerror="this.style.display='none'">
+        <p><b>Карта с Правилами</b> — информационная. В оригинале "DISCARD BEFORE PLAY". У нас открывает правила.</p>
+        <p>Колода 52 + Джокер. Джокер дикий.</p>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="score-pill">Оффлайн</span>
+          <span class="score-pill">1 игрок vs бот</span>
+        </div>
+      </div>
+      <div>
+        <div class="rule-block"><h3>🃑 21 ТЬМЫ <span class="tag">Блэкджек</span></h3><p><b>Цель:</b> 21 очко. 2–10 номинал, J/Q/K=10, Туз 11/1, Джокер 11/1 спасает от перебора.</p></div>
+        <div class="rule-block"><h3>🛡️ КОРОЛЕВСКИЙ ДУРАК <span class="tag">Дурак</span></h3><p>36 карт (6–Туз). Козырь рандом. Отбивайся старшей мастью или козырем. Джокер бьет всё.</p></div>
+        <div class="rule-block"><h3>👁️ ПАМЯТЬ ТЕНЕЙ <span class="tag">Мемори</span></h3><p>Найди пары по рангу. 4×4 или 6×6.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-games" class="tab">
+    <div class="games-nav">
+      <button data-game="blackjack" class="active">🃑 21 ТЬМЫ</button>
+      <button data-game="durak">🛡️ Королевский Дурак</button>
+      <button data-game="memory">👁️ Память Теней</button>
+    </div>
+
+    <div id="game-blackjack" class="game-area">
+      <div class="bj-layout">
+        <div>
+          <div class="durak-top"><h3 style="margin:0;font-size:28px">Дилер — Тёмный Продавец</h3>
+            <div class="scoreboard">
+              <span class="score-pill">Твои очки: <b id="bj-player-score">0</b></span>
+              <span class="score-pill">Дилер: <b id="bj-dealer-score">?</b></span>
+              <span class="score-pill">Банк: <b id="bj-bank">0</b></span>
+            </div>
+          </div>
+          <div><div style="color:var(--muted);font-size:12px;margin-bottom:6px">КАРТЫ ДИЛЕРА</div><div id="bj-dealer-hand" class="hand"></div></div>
+          <div class="table-area"><div id="bj-status" class="status">Нажми "Новая раздача"</div>
+            <div class="controls">
+              <button id="bj-deal" class="btn btn-purple">🎲 Новая раздача</button>
+              <button id="bj-hit" class="btn btn-primary" disabled>➕ Взять</button>
+              <button id="bj-stand" class="btn btn-ghost" disabled>✋ Хватит</button>
+            </div>
+          </div>
+          <div style="margin-top:16px"><div style="color:var(--muted);font-size:12px;margin-bottom:6px">ТВОИ КАРТЫ</div><div id="bj-player-hand" class="hand"></div></div>
+        </div>
+        <div>
+          <div class="rule-block" style="margin:0"><h3 style="font-size:20px">Подсказки</h3><p style="font-size:13px">Дилер на 17 встает. Туз 11/1. Джокер спасает.</p><div style="margin-top:12px"><div class="score-pill">Побед: <b id="bj-wins">0</b></div><div class="score-pill" style="margin-top:8px">Поражений: <b id="bj-losses">0</b></div><div class="score-pill" style="margin-top:8px">Ничьих: <b id="bj-pushes">0</b></div></div></div>
+          <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px"><div style="font-size:12px;color:var(--muted)">ЛОГ</div><div id="bj-log" style="font-size:13px;line-height:1.5;max-height:180px;overflow:auto;margin-top:8px;color:#c8c4d6"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="game-durak" class="game-area" style="display:none">
+      <div class="durak-top"><h3 style="margin:0;font-size:28px">Дурак — vs Лансер</h3>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div class="trump-badge">Козырь: <span id="durak-trump-text">?</span> <img id="durak-trump-img" src="" alt="" style="display:none"></div>
+          <span class="score-pill">В колоде: <b id="durak-deck-count">0</b></span>
+          <span class="score-pill">Бито: <b id="durak-beaten">0</b></span>
+        </div>
+      </div>
+      <div id="durak-status" class="status">Нажми "Новая игра"</div>
+      <div><div style="color:var(--muted);font-size:12px">РУКА ЛАНСЕРА (<span id="durak-opp-count">0</span>)</div><div id="durak-opp-hand" class="opponent-hand"></div></div>
+      <div class="table-area"><div id="durak-table" class="table-cards"></div>
+        <div class="controls" style="margin-top:12px">
+          <button id="durak-new" class="btn btn-purple">🎲 Новая игра</button>
+          <button id="durak-attack" class="btn btn-primary" disabled>⚔️ Атаковать</button>
+          <button id="durak-defend" class="btn btn-primary" disabled>🛡️ Отбиться</button>
+          <button id="durak-take" class="btn btn-ghost" disabled>🤲 Забрать</button>
+          <button id="durak-done" class="btn btn-ghost" disabled>✅ Бито</button>
+        </div>
+      </div>
+      <div><div style="color:var(--muted);font-size:12px">ТВОЯ РУКА — кликни чтобы выбрать</div><div id="durak-player-hand" class="hand your-hand" style="margin-top:8px"></div></div>
+    </div>
+
+    <div id="game-memory" class="game-area" style="display:none">
+      <div class="durak-top"><h3 style="margin:0;font-size:28px">Память Теней</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="score-pill">Ходы: <b id="mem-moves">0</b></span>
+          <span class="score-pill">Найдено: <b id="mem-found">0</b>/<span id="mem-total">0</span></span>
+          <span class="score-pill">Время: <b id="mem-time">00:00</b></span>
+          <select id="mem-size" class="btn btn-ghost" style="padding:8px 12px"><option value="4">4×4 — легко</option><option value="6">6×6 — кошмар</option></select>
+          <button id="mem-new" class="btn btn-purple">Новая игра</button>
+        </div>
+      </div>
+      <div id="mem-status" class="status">Найди все пары по рангу.</div>
+      <div id="mem-grid" class="memory-grid cols4"></div>
+    </div>
+  </section>
+
+  <footer class="footer">DELTARUNE Dark Deck • Оффлайн • <span id="year"></span></footer>
+</div>
+
+<div id="modal" class="modal"><div class="modal-box"><img id="modal-img" src="" alt=""><div id="modal-meta" style="margin-top:10px;color:var(--muted);font-size:13px"></div><button class="btn btn-ghost close" style="width:100%;margin-top:12px" onclick="document.getElementById('modal').classList.remove('open')">Закрыть</button></div></div>
+
+<script>
+// ===== EMBEDDED MANIFEST (работает без fetch и на file://) =====
+const EMBEDDED_MANIFEST = [
+  {
+    "id": "clubs_2",
+    "suit": "clubs",
+    "rank": "2",
+    "file": "assets/cards/clubs_2.png",
+    "original": "2 Крести.png"
+  },
+  {
+    "id": "clubs_3",
+    "suit": "clubs",
+    "rank": "3",
+    "file": "assets/cards/clubs_3.png",
+    "original": "3 Крести.png"
+  },
+  {
+    "id": "clubs_4",
+    "suit": "clubs",
+    "rank": "4",
+    "file": "assets/cards/clubs_4.png",
+    "original": "4 Крести.png"
+  },
+  {
+    "id": "clubs_5",
+    "suit": "clubs",
+    "rank": "5",
+    "file": "assets/cards/clubs_5.png",
+    "original": "5 Крести.png"
+  },
+  {
+    "id": "clubs_6",
+    "suit": "clubs",
+    "rank": "6",
+    "file": "assets/cards/clubs_6.png",
+    "original": "6 Крести.png"
+  },
+  {
+    "id": "clubs_7",
+    "suit": "clubs",
+    "rank": "7",
+    "file": "assets/cards/clubs_7.png",
+    "original": "7 Крести.png"
+  },
+  {
+    "id": "clubs_8",
+    "suit": "clubs",
+    "rank": "8",
+    "file": "assets/cards/clubs_8.png",
+    "original": "8 Крести.png"
+  },
+  {
+    "id": "clubs_9",
+    "suit": "clubs",
+    "rank": "9",
+    "file": "assets/cards/clubs_9.png",
+    "original": "9 Крести.png"
+  },
+  {
+    "id": "clubs_10",
+    "suit": "clubs",
+    "rank": "10",
+    "file": "assets/cards/clubs_10.png",
+    "original": "10 Крести.png"
+  },
+  {
+    "id": "clubs_j",
+    "suit": "clubs",
+    "rank": "J",
+    "file": "assets/cards/clubs_j.png",
+    "original": "Крестовый Валет.png"
+  },
+  {
+    "id": "clubs_q",
+    "suit": "clubs",
+    "rank": "Q",
+    "file": "assets/cards/clubs_q.png",
+    "original": "Крестовая Дама.png"
+  },
+  {
+    "id": "clubs_k",
+    "suit": "clubs",
+    "rank": "K",
+    "file": "assets/cards/clubs_k.png",
+    "original": "Крестовый Король.png"
+  },
+  {
+    "id": "clubs_a",
+    "suit": "clubs",
+    "rank": "A",
+    "file": "assets/cards/clubs_a.png",
+    "original": "Крестовый Туз.png"
+  },
+  {
+    "id": "diamonds_2",
+    "suit": "diamonds",
+    "rank": "2",
+    "file": "assets/cards/diamonds_2.png",
+    "original": "2 Бубны.png"
+  },
+  {
+    "id": "diamonds_3",
+    "suit": "diamonds",
+    "rank": "3",
+    "file": "assets/cards/diamonds_3.png",
+    "original": "3 Бубны.png"
+  },
+  {
+    "id": "diamonds_4",
+    "suit": "diamonds",
+    "rank": "4",
+    "file": "assets/cards/diamonds_4.png",
+    "original": "4 Бубны.png"
+  },
+  {
+    "id": "diamonds_5",
+    "suit": "diamonds",
+    "rank": "5",
+    "file": "assets/cards/diamonds_5.png",
+    "original": "5 Бубны.png"
+  },
+  {
+    "id": "diamonds_6",
+    "suit": "diamonds",
+    "rank": "6",
+    "file": "assets/cards/diamonds_6.png",
+    "original": "6 Бубны.png"
+  },
+  {
+    "id": "diamonds_7",
+    "suit": "diamonds",
+    "rank": "7",
+    "file": "assets/cards/diamonds_7.png",
+    "original": "7 Бубны.png"
+  },
+  {
+    "id": "diamonds_8",
+    "suit": "diamonds",
+    "rank": "8",
+    "file": "assets/cards/diamonds_8.png",
+    "original": "8 Бубны.png"
+  },
+  {
+    "id": "diamonds_9",
+    "suit": "diamonds",
+    "rank": "9",
+    "file": "assets/cards/diamonds_9.png",
+    "original": "9 Бубны.png"
+  },
+  {
+    "id": "diamonds_10",
+    "suit": "diamonds",
+    "rank": "10",
+    "file": "assets/cards/diamonds_10.png",
+    "original": "10 Бубны.png"
+  },
+  {
+    "id": "diamonds_j",
+    "suit": "diamonds",
+    "rank": "J",
+    "file": "assets/cards/diamonds_j.png",
+    "original": "Бубновый Валет.png"
+  },
+  {
+    "id": "diamonds_q",
+    "suit": "diamonds",
+    "rank": "Q",
+    "file": "assets/cards/diamonds_q.png",
+    "original": "Бубновая Дама.png"
+  },
+  {
+    "id": "diamonds_k",
+    "suit": "diamonds",
+    "rank": "K",
+    "file": "assets/cards/diamonds_k.png",
+    "original": "Бубновый Король.png"
+  },
+  {
+    "id": "diamonds_a",
+    "suit": "diamonds",
+    "rank": "A",
+    "file": "assets/cards/diamonds_a.png",
+    "original": "Бубновый Туз.png"
+  },
+  {
+    "id": "hearts_2",
+    "suit": "hearts",
+    "rank": "2",
+    "file": "assets/cards/hearts_2.png",
+    "original": "2 Черви.png"
+  },
+  {
+    "id": "hearts_3",
+    "suit": "hearts",
+    "rank": "3",
+    "file": "assets/cards/hearts_3.png",
+    "original": "3 Черви.png"
+  },
+  {
+    "id": "hearts_4",
+    "suit": "hearts",
+    "rank": "4",
+    "file": "assets/cards/hearts_4.png",
+    "original": "4 Черви.png"
+  },
+  {
+    "id": "hearts_5",
+    "suit": "hearts",
+    "rank": "5",
+    "file": "assets/cards/hearts_5.png",
+    "original": "5 Черви.png"
+  },
+  {
+    "id": "hearts_6",
+    "suit": "hearts",
+    "rank": "6",
+    "file": "assets/cards/hearts_6.png",
+    "original": "6 Черви.png"
+  },
+  {
+    "id": "hearts_7",
+    "suit": "hearts",
+    "rank": "7",
+    "file": "assets/cards/hearts_7.png",
+    "original": "7 Черви.png"
+  },
+  {
+    "id": "hearts_8",
+    "suit": "hearts",
+    "rank": "8",
+    "file": "assets/cards/hearts_8.png",
+    "original": "8 Черви.png"
+  },
+  {
+    "id": "hearts_9",
+    "suit": "hearts",
+    "rank": "9",
+    "file": "assets/cards/hearts_9.png",
+    "original": "9 Черви.png"
+  },
+  {
+    "id": "hearts_10",
+    "suit": "hearts",
+    "rank": "10",
+    "file": "assets/cards/hearts_10.png",
+    "original": "10 Черви.png"
+  },
+  {
+    "id": "hearts_j",
+    "suit": "hearts",
+    "rank": "J",
+    "file": "assets/cards/hearts_j.png",
+    "original": "Червонный Валет.png"
+  },
+  {
+    "id": "hearts_q",
+    "suit": "hearts",
+    "rank": "Q",
+    "file": "assets/cards/hearts_q.png",
+    "original": "Червонная дама.png"
+  },
+  {
+    "id": "hearts_k",
+    "suit": "hearts",
+    "rank": "K",
+    "file": "assets/cards/hearts_k.png",
+    "original": "Червонный король.png"
+  },
+  {
+    "id": "hearts_a",
+    "suit": "hearts",
+    "rank": "A",
+    "file": "assets/cards/hearts_a.png",
+    "original": "Червонный Туз.png"
+  },
+  {
+    "id": "spades_2",
+    "suit": "spades",
+    "rank": "2",
+    "file": "assets/cards/spades_2.png",
+    "original": "2 Пики.png"
+  },
+  {
+    "id": "spades_3",
+    "suit": "spades",
+    "rank": "3",
+    "file": "assets/cards/spades_3.png",
+    "original": "3 Пики.png"
+  },
+  {
+    "id": "spades_4",
+    "suit": "spades",
+    "rank": "4",
+    "file": "assets/cards/spades_4.png",
+    "original": "4 Пики.png"
+  },
+  {
+    "id": "spades_5",
+    "suit": "spades",
+    "rank": "5",
+    "file": "assets/cards/spades_5.png",
+    "original": "5 Пики.png"
+  },
+  {
+    "id": "spades_6",
+    "suit": "spades",
+    "rank": "6",
+    "file": "assets/cards/spades_6.png",
+    "original": "6 Пики.png"
+  },
+  {
+    "id": "spades_7",
+    "suit": "spades",
+    "rank": "7",
+    "file": "assets/cards/spades_7.png",
+    "original": "7 Пики.png"
+  },
+  {
+    "id": "spades_8",
+    "suit": "spades",
+    "rank": "8",
+    "file": "assets/cards/spades_8.png",
+    "original": "8 Пики.png"
+  },
+  {
+    "id": "spades_9",
+    "suit": "spades",
+    "rank": "9",
+    "file": "assets/cards/spades_9.png",
+    "original": "9 Пики.png"
+  },
+  {
+    "id": "spades_10",
+    "suit": "spades",
+    "rank": "10",
+    "file": "assets/cards/spades_10.png",
+    "original": "10 Пики.png"
+  },
+  {
+    "id": "spades_j",
+    "suit": "spades",
+    "rank": "J",
+    "file": "assets/cards/spades_j.png",
+    "original": "Пиковый Валет.png"
+  },
+  {
+    "id": "spades_q",
+    "suit": "spades",
+    "rank": "Q",
+    "file": "assets/cards/spades_q.png",
+    "original": "Пиковая Дама.png"
+  },
+  {
+    "id": "spades_k",
+    "suit": "spades",
+    "rank": "K",
+    "file": "assets/cards/spades_k.png",
+    "original": "Пиковая Король.png"
+  },
+  {
+    "id": "spades_a",
+    "suit": "spades",
+    "rank": "A",
+    "file": "assets/cards/spades_a.png",
+    "original": "Пиковый Туз.png"
+  },
+  {
+    "id": "joker",
+    "suit": "joker",
+    "rank": "JOKER",
+    "file": "assets/cards/joker.jpg",
+    "original": "Шут.jpg"
+  }
+];
+
+let allCards = EMBEDDED_MANIFEST;
+let manifestById = Object.fromEntries(allCards.map(c=>[c.id,c]));
+
+function suitLabel(s){const m={spades:'Пики',clubs:'Крести',hearts:'Черви',diamonds:'Бубны',joker:'Джокер'};return m[s]||s}
+function rankLabel(r){const m={J:'Валет',Q:'Дама',K:'Король',A:'Туз',JOKER:'Шут'};return m[r]||r}
+function createCardElement(card, extraClass=''){
+  const div=document.createElement('div');
+  div.className='playing-card '+extraClass;
+  const img=document.createElement('img');
+  img.src=card.file;
+  img.alt=card.original||card.id;
+  img.loading='lazy';
+  img.onerror=()=>{
+    // fallback text card
+    div.classList.add('fallback');
+    div.innerHTML=`<div class="big">${card.rank}</div><div class="small">${suitLabel(card.suit)}</div><div class="small" style="font-size:9px;word-break:break-all">${card.id}</div>`;
+  };
+  div.appendChild(img);
+  return div;
+}
+
+// tabs
+document.querySelectorAll('.nav button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  })
+});
+document.querySelectorAll('.games-nav button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.games-nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const g=btn.dataset.game;
+    document.getElementById('game-blackjack').style.display=g==='blackjack'?'block':'none';
+    document.getElementById('game-durak').style.display=g==='durak'?'block':'none';
+    document.getElementById('game-memory').style.display=g==='memory'?'block':'none';
+  })
+});
+
+// deck render
+function renderDeck(){
+  const container=document.getElementById('deck-container');
+  const order=['spades','clubs','hearts','diamonds','joker'];
+  const names={spades:'♠ Пики',clubs:'♣ Крести',hearts:'♥ Черви',diamonds:'♦ Бубны',joker:'🃏 Джокер'};
+  let html='';
+  for(const suit of order){
+    const cards=allCards.filter(c=>c.suit===suit);
+    if(!cards.length) continue;
+    html+=`<div class="suit-section"><div class="suit-head"><div class="suit-badge ${suit}">${suit==='spades'?'♠':suit==='clubs'?'♣':suit==='hearts'?'♥':suit==='diamonds'?'♦':'J'}</div><h3 style="margin:0;font-size:28px">${names[suit]} — ${cards.length}</h3></div><div class="grid">`;
+    for(const card of cards){
+      html+=`<div class="card-tile" data-id="${card.id}"><img src="${card.file}" loading="lazy" alt="${card.original}" onerror="this.style.background='#222'; this.alt='no img'"><div class="meta"><b>${rankLabel(card.rank)} ${suitLabel(card.suit)}</b><span>${card.rank}</span></div></div>`;
+    }
+    html+=`</div></div>`;
+  }
+  container.innerHTML=html;
+  container.querySelectorAll('.card-tile').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const card=manifestById[el.dataset.id];
+      if(!card) return;
+      document.getElementById('modal-img').src=card.file;
+      document.getElementById('modal-meta').textContent=`${rankLabel(card.rank)} ${suitLabel(card.suit)} • ${card.original} • ${card.id}`;
+      document.getElementById('modal').classList.add('open');
+    })
+  });
+  // check if images missing
+  setTimeout(()=>{
+    const imgs=container.querySelectorAll('img');
+    let failed=0;
+    imgs.forEach(i=>{if(!i.complete || i.naturalWidth===0) failed++});
+    if(failed>10){
+      document.getElementById('file-warning').style.display='block';
+    }
+  },1500);
+}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal') e.currentTarget.classList.remove('open')});
+
+// BLACKJACK
+let bjDeck=[], bjPlayer=[], bjDealer=[], bjGameOver=false, bjWins=0,bjLosses=0,bjPushes=0,bjBank=0;
+function shuffle(a){const arr=[...a];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function bjCreateDeck(){let deck=allCards.filter(c=>c.suit!=='joker').map(c=>({...c}));const j=allCards.find(c=>c.suit==='joker');if(j) deck.push({...j});return shuffle(deck)}
+function bjValue(hand){let total=0,aces=0,jokers=0;for(const c of hand){if(c.rank==='JOKER'){jokers++;total+=11}else if(['J','Q','K'].includes(c.rank)) total+=10; else if(c.rank==='A'){aces++;total+=11}else total+=parseInt(c.rank,10)||0}while(total>21&&aces>0){total-=10;aces--}while(total>21&&jokers>0){total-=10;jokers--}return total}
+function renderBjHand(el,hand,hideSecond=false){el.innerHTML='';hand.forEach((c,i)=>{if(hideSecond&&i===1){const d=document.createElement('div');d.className='playing-card back';el.appendChild(d)}else{el.appendChild(createCardElement(c))}})}
+function bjLog(m){const log=document.getElementById('bj-log');const d=document.createElement('div');d.textContent='• '+m;log.prepend(d)}
+function bjUpdateUI(reveal=false){renderBjHand(document.getElementById('bj-player-hand'),bjPlayer,false);renderBjHand(document.getElementById('bj-dealer-hand'),bjDealer,!reveal&&!bjGameOver);document.getElementById('bj-player-score').textContent=bjValue(bjPlayer);document.getElementById('bj-dealer-score').textContent=reveal||bjGameOver?bjValue(bjDealer):'?'}
+function bjDeal(){bjDeck=bjCreateDeck();if(bjDeck.length<4){document.getElementById('bj-status').textContent='Ошибка колоды!';return}bjPlayer=[bjDeck.pop(),bjDeck.pop()];bjDealer=[bjDeck.pop(),bjDeck.pop()];bjGameOver=false;document.getElementById('bj-hit').disabled=false;document.getElementById('bj-stand').disabled=false;document.getElementById('bj-status').textContent='Твой ход — Взять или Хватит?';document.getElementById('bj-status').className='status';bjUpdateUI(false);const pv=bjValue(bjPlayer);if(pv===21){bjLog('Темный Джек!');setTimeout(bjStand,400)}else bjLog(`Раздача — у тебя ${pv}`)}
+function bjHit(){if(bjGameOver) return;if(bjDeck.length===0) bjDeck=bjCreateDeck();bjPlayer.push(bjDeck.pop());bjUpdateUI(false);const v=bjValue(bjPlayer);bjLog(`Взял ${bjPlayer[bjPlayer.length-1].rank} — ${v}`);if(v>21){bjGameOver=true;document.getElementById('bj-status').textContent='Перебор! Проиграл.';document.getElementById('bj-status').className='status lose';document.getElementById('bj-hit').disabled=true;document.getElementById('bj-stand').disabled=true;bjLosses++;bjBank-=10;updateBjStats()}else if(v===21) bjStand()}
+function bjStand(){if(bjGameOver) return;bjGameOver=true;document.getElementById('bj-hit').disabled=true;document.getElementById('bj-stand').disabled=true;let dv=bjValue(bjDealer);while(dv<17&&bjDeck.length){bjDealer.push(bjDeck.pop());dv=bjValue(bjDealer)}bjUpdateUI(true);const pv=bjValue(bjPlayer);const el=document.getElementById('bj-status');if(dv>21){el.textContent=`Дилер перебрал (${dv}) — выиграл!`;el.className='status win';bjWins++;bjBank+=10;bjLog(`Дилер перебрал ${dv}`)}else if(dv===pv){el.textContent=`Ничья ${pv} vs ${dv}`;el.className='status draw';bjPushes++;bjLog(`Ничья ${pv}`)}else if(pv>dv){el.textContent=`Выиграл! ${pv} vs ${dv}`;el.className='status win';bjWins++;bjBank+=10;bjLog(`Победа ${pv} vs ${dv}`)}else{el.textContent=`Проиграл ${pv} vs ${dv}`;el.className='status lose';bjLosses++;bjBank-=10;bjLog(`Поражение ${pv} vs ${dv}`)}updateBjStats()}
+function updateBjStats(){document.getElementById('bj-wins').textContent=bjWins;document.getElementById('bj-losses').textContent=bjLosses;document.getElementById('bj-pushes').textContent=bjPushes;document.getElementById('bj-bank').textContent=bjBank}
+document.getElementById('bj-deal').addEventListener('click',bjDeal);
+document.getElementById('bj-hit').addEventListener('click',bjHit);
+document.getElementById('bj-stand').addEventListener('click',bjStand);
+
+// DURAK
+let durakDeck=[],durakPlayer=[],durakOpp=[],durakTable=[],durakTrump=null,durakTrumpSuit=null,durakBeaten=[],durakIsPlayerAttack=true,durakSelected=null,durakGameOver=false;
+function durakRankValue(r){const o={"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14,"JOKER":99,"2":2,"3":3,"4":4,"5":5};return o[r]||0}
+function durakCreateDeck(){let cards=allCards.filter(c=>{if(c.suit==='joker')return true;return durakRankValue(c.rank)>=6}).map(c=>({...c}));return shuffle(cards)}
+function durakCanBeat(att,def,trump){if(def.rank==='JOKER')return true;if(att.rank==='JOKER'){if(def.rank==='JOKER')return true;if(def.suit===trump&&def.rank==='A')return true;return false}if(def.suit===att.suit) return durakRankValue(def.rank)>durakRankValue(att.rank);if(def.suit===trump&&att.suit!==trump) return true;return false}
+function renderDurak(){
+  document.getElementById('durak-deck-count').textContent=durakDeck.length;
+  document.getElementById('durak-beaten').textContent=durakBeaten.length;
+  document.getElementById('durak-opp-count').textContent=durakOpp.length;
+  document.getElementById('durak-trump-text').textContent=durakTrump?`${suitLabel(durakTrump.suit)} (${durakTrumpSuit? suitLabel(durakTrumpSuit):''})`:'?';
+  const ti=document.getElementById('durak-trump-img');if(durakTrump){ti.src=durakTrump.file;ti.style.display='block';ti.onerror=()=>ti.style.display='none'}else ti.style.display='none';
+  const opp=document.getElementById('durak-opp-hand');opp.innerHTML='';durakOpp.forEach(()=>{const d=document.createElement('div');d.className='playing-card back';opp.appendChild(d)});
+  const pl=document.getElementById('durak-player-hand');pl.innerHTML='';durakPlayer.forEach((c,idx)=>{const d=createCardElement(c, durakSelected===idx?'selected':'');if(durakSelected===idx) d.classList.add('selected');d.addEventListener('click',()=>{if(durakGameOver) return;durakSelected=idx;renderDurak();updateDurakBtns()});pl.appendChild(d)});
+  const table=document.getElementById('durak-table');table.innerHTML='';durakTable.forEach(pair=>{const w=document.createElement('div');w.className='attack-defense';const a=createCardElement(pair.attack);a.style.width='80px';w.appendChild(a);const vs=document.createElement('div');vs.className='vs';vs.textContent=pair.defense?'БИТО':'АТАКА';w.appendChild(vs);if(pair.defense){const de=createCardElement(pair.defense);de.style.width='80px';w.appendChild(de)}table.appendChild(w)});
+  if(!durakGameOver&&durakDeck.length===0){if(durakPlayer.length===0&&durakOpp.length===0){document.getElementById('durak-status').textContent='Ничья!';document.getElementById('durak-status').className='status draw';durakGameOver=true}else if(durakPlayer.length===0){document.getElementById('durak-status').textContent='Ты выиграл! Лансер — дурак!';document.getElementById('durak-status').className='status win';durakGameOver=true}else if(durakOpp.length===0){document.getElementById('durak-status').textContent='Лансер выиграл.';document.getElementById('durak-status').className='status lose';durakGameOver=true}}
+}
+function updateDurakBtns(){const has=durakSelected!==null;document.getElementById('durak-attack').disabled=!has||!durakIsPlayerAttack||durakGameOver;document.getElementById('durak-defend').disabled=!has||durakIsPlayerAttack||durakGameOver;document.getElementById('durak-take').disabled=durakIsPlayerAttack||durakGameOver||durakTable.length===0;const allDef=durakTable.length>0&&durakTable.every(p=>p.defense);document.getElementById('durak-done').disabled=durakTable.length===0||!allDef}
+function durakDraw(){while(durakPlayer.length<6&&durakDeck.length) durakPlayer.push(durakDeck.pop());while(durakOpp.length<6&&durakDeck.length) durakOpp.push(durakDeck.pop())}
+function durakNew(){durakDeck=durakCreateDeck();durakTrump=durakDeck[0];durakTrumpSuit=durakTrump.suit==='joker'?['spades','clubs','hearts','diamonds'][Math.floor(Math.random()*4)]:durakTrump.suit;durakPlayer=[];durakOpp=[];durakTable=[];durakBeaten=[];durakSelected=null;durakGameOver=false;durakIsPlayerAttack=true;for(let i=0;i<6;i++){if(durakDeck.length) durakPlayer.push(durakDeck.pop());if(durakDeck.length) durakOpp.push(durakDeck.pop())}document.getElementById('durak-status').textContent='Твоя атака!';document.getElementById('durak-status').className='status';renderDurak();updateDurakBtns()}
+document.getElementById('durak-new').addEventListener('click',durakNew);
+document.getElementById('durak-attack').addEventListener('click',()=>{
+  if(durakSelected===null) return;const card=durakPlayer[durakSelected];
+  if(durakTable.length>0){const ranks=new Set();durakTable.forEach(p=>{ranks.add(p.attack.rank);if(p.defense) ranks.add(p.defense.rank)});if(!ranks.has(card.rank)&&card.rank!=='JOKER'){document.getElementById('durak-status').textContent='Можно только ранг со стола!';document.getElementById('durak-status').className='status lose';return}}
+  durakTable.push({attack:card,defense:null});durakPlayer.splice(durakSelected,1);durakSelected=null;document.getElementById('durak-status').textContent='Лансер думает...';renderDurak();setTimeout(durakBotDef,800);
+});
+function durakBotDef(){
+  if(durakGameOver) return;const idx=durakTable.findIndex(p=>!p.defense);if(idx===-1){document.getElementById('durak-status').textContent='Лансер отбился. Подкинь или Бито.';document.getElementById('durak-status').className='status win';renderDurak();updateDurakBtns();return}
+  const att=durakTable[idx].attack;let best=null,bIdx=-1,bVal=Infinity;durakOpp.forEach((c,i)=>{if(durakCanBeat(att,c,durakTrumpSuit)){const v=durakRankValue(c.rank)+(c.suit===durakTrumpSuit?100:0);if(v<bVal){bVal=v;best=c;bIdx=i}}});if(best){durakTable[idx].defense=best;durakOpp.splice(bIdx,1);document.getElementById('durak-status').textContent=`Лансер отбился ${best.rank}`;}else{document.getElementById('durak-status').textContent='Лансер забирает!';document.getElementById('durak-status').className='status lose';durakTable.forEach(p=>{durakOpp.push(p.attack);if(p.defense) durakOpp.push(p.defense)});durakTable=[];durakDraw();durakIsPlayerAttack=true;renderDurak();updateDurakBtns();return}renderDurak();updateDurakBtns();
+}
+document.getElementById('durak-defend').addEventListener('click',()=>{
+  if(durakSelected===null) return;const idx=durakTable.findIndex(p=>!p.defense);if(idx===-1){document.getElementById('durak-status').textContent='Все отбито, жми Бито';return}
+  const att=durakTable[idx].attack;const def=durakPlayer[durakSelected];if(!durakCanBeat(att,def,durakTrumpSuit)){document.getElementById('durak-status').textContent='Не бьет!';document.getElementById('durak-status').className='status lose';return}
+  durakTable[idx].defense=def;durakPlayer.splice(durakSelected,1);durakSelected=null;renderDurak();if(durakTable.every(p=>p.defense)){document.getElementById('durak-status').textContent='Отбился!';setTimeout(()=>{if(!durakIsPlayerAttack){durakBotAdd()}},900)}else document.getElementById('durak-status').textContent='Отбивай дальше';updateDurakBtns();
+});
+function durakBotAdd(){if(durakGameOver||durakIsPlayerAttack) return;const ranks=new Set();durakTable.forEach(p=>{ranks.add(p.attack.rank);if(p.defense) ranks.add(p.defense.rank)});const cand=durakOpp.filter(c=>ranks.has(c.rank)||c.rank==='JOKER');if(cand.length&&durakTable.length<6){cand.sort((a,b)=>durakRankValue(a.rank)-durakRankValue(b.rank));const card=cand[0];durakOpp.splice(durakOpp.indexOf(card),1);durakTable.push({attack:card,defense:null});document.getElementById('durak-status').textContent=`Лансер подкидывает ${card.rank}`;renderDurak();updateDurakBtns()}else{durakBotFinish()}}
+function durakBotFinish(){durakTable.forEach(p=>{durakBeaten.push(p.attack);if(p.defense) durakBeaten.push(p.defense)});durakTable=[];durakDraw();durakIsPlayerAttack=false;renderDurak();setTimeout(()=>durakBotAttack(),600)}
+function durakBotAttack(){if(durakOpp.length===0) return;const sorted=[...durakOpp].sort((a,b)=>durakRankValue(a.rank)-durakRankValue(b.rank));const card=sorted[0];durakOpp.splice(durakOpp.indexOf(card),1);durakTable.push({attack:card,defense:null});durakIsPlayerAttack=false;document.getElementById('durak-status').textContent=`Лансер атакует ${card.rank} — отбивайся!`;renderDurak();updateDurakBtns()}
+document.getElementById('durak-done').addEventListener('click',()=>{
+  if(durakTable.some(p=>!p.defense)) return;
+  if(durakIsPlayerAttack){durakTable.forEach(p=>{durakBeaten.push(p.attack);if(p.defense) durakBeaten.push(p.defense)});durakTable=[];durakDraw();durakIsPlayerAttack=false;renderDurak();durakBotAttack()}else{durakTable.forEach(p=>{durakBeaten.push(p.attack);if(p.defense) durakBeaten.push(p.defense)});durakTable=[];durakDraw();durakIsPlayerAttack=true;document.getElementById('durak-status').textContent='Твоя атака!';renderDurak();updateDurakBtns()}
+});
+document.getElementById('durak-take').addEventListener('click',()=>{
+  durakTable.forEach(p=>{durakPlayer.push(p.attack);if(p.defense) durakPlayer.push(p.defense)});durakTable=[];durakDraw();durakIsPlayerAttack=false;document.getElementById('durak-status').textContent='Ты забрал. Атакует Лансер.';renderDurak();setTimeout(()=>durakBotAttack(),700);
+});
+
+// MEMORY
+let memCards=[],memFlipped=[],memMatched=0,memMoves=0,memTimer=null,memSeconds=0,memLock=false;
+function memFormat(s){const m=String(Math.floor(s/60)).padStart(2,'0');const sec=String(s%60).padStart(2,'0');return `${m}:${sec}`}
+function memNew(){
+  const size=parseInt(document.getElementById('mem-size').value,10);const pairs=size*size/2;
+  const byRank={};allCards.forEach(c=>{if(!byRank[c.rank]) byRank[c.rank]=[];byRank[c.rank].push(c)});
+  let chosen=[];let avail=Object.keys(byRank);while(chosen.length<pairs){chosen.push(avail[Math.floor(Math.random()*avail.length)])}
+  let cards=[];chosen.forEach(rank=>{const list=byRank[rank]||[];if(list.length>=2){const sh=shuffle(list);cards.push({...sh[0]},{...sh[1]})}else if(list.length===1){cards.push({...list[0]},{...list[0],id:list[0].id+'_c'})}else{const any=allCards[Math.floor(Math.random()*allCards.length)];cards.push({...any},{...any,id:any.id+'_c'})}});
+  memCards=shuffle(cards);memFlipped=[];memMatched=0;memMoves=0;memSeconds=0;memLock=false;
+  document.getElementById('mem-moves').textContent='0';document.getElementById('mem-found').textContent='0';document.getElementById('mem-total').textContent=pairs;document.getElementById('mem-time').textContent='00:00';
+  document.getElementById('mem-status').textContent=`Найди ${pairs} пар`;document.getElementById('mem-status').className='status';
+  const grid=document.getElementById('mem-grid');grid.className='memory-grid '+(size===4?'cols4':'cols6');grid.innerHTML='';
+  memCards.forEach((c,i)=>{const div=document.createElement('div');div.className='mem-card';div.dataset.index=i;div.innerHTML=`<div class="face back"></div><div class="face front"><img src="${c.file}" alt="${c.rank}" onerror="this.parentElement.textContent='${c.rank}'"></div>`;div.addEventListener('click',()=>memFlip(i));grid.appendChild(div)});
+  if(memTimer) clearInterval(memTimer);memTimer=setInterval(()=>{memSeconds++;document.getElementById('mem-time').textContent=memFormat(memSeconds)},1000);
+}
+function memFlip(idx){if(memLock) return;const el=document.querySelector(`.mem-card[data-index="${idx}"]`);if(!el||el.classList.contains('flipped')||el.classList.contains('matched')) return;el.classList.add('flipped');memFlipped.push(idx);if(memFlipped.length===2){memMoves++;document.getElementById('mem-moves').textContent=memMoves;const [a,b]=memFlipped;const ca=memCards[a],cb=memCards[b];const match=ca.rank===cb.rank;if(match){setTimeout(()=>{document.querySelector(`.mem-card[data-index="${a}"]`).classList.add('matched');document.querySelector(`.mem-card[data-index="${b}"]`).classList.add('matched');memMatched++;document.getElementById('mem-found').textContent=memMatched;memFlipped=[];if(memMatched===memCards.length/2){clearInterval(memTimer);document.getElementById('mem-status').textContent=`Победа! ${memMoves} ходов, ${memFormat(memSeconds)}`;document.getElementById('mem-status').className='status win'}},400)}else{memLock=true;setTimeout(()=>{document.querySelector(`.mem-card[data-index="${a}"]`).classList.remove('flipped');document.querySelector(`.mem-card[data-index="${b}"]`).classList.remove('flipped');memFlipped=[];memLock=false},900)}}}
+document.getElementById('mem-new').addEventListener('click',memNew);
+document.getElementById('mem-size').addEventListener('change',memNew);
+
+// init
+document.getElementById('year').textContent=new Date().getFullYear();
+renderDeck();
+memNew();
+if(location.protocol==='file:'){
+  // try to detect missing assets
+  setTimeout(()=>{
+    const testImg=new Image();
+    testImg.src='assets/cards/clubs_2.png';
+    testImg.onerror=()=>{document.getElementById('file-warning').style.display='block'}
+  },500);
+}
+</script>
+</body>
+</html>
